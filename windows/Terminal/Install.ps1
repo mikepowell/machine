@@ -14,7 +14,6 @@ Param(
 )
 
 . (Join-Path $PSScriptRoot "../Utilities/Fonts.ps1")
-. (Join-Path $PSScriptRoot "../Utilities/Starship.ps1")
 . (Join-Path $PSScriptRoot "../Utilities/Store.ps1")
 . (Join-Path $PSScriptRoot "../Utilities/Terminal.ps1")
 . (Join-Path $PSScriptRoot "../Utilities/Utilities.ps1")
@@ -27,18 +26,10 @@ if (!$PowerShellProfile.IsPresent -and !$Fonts.IsPresent -and !$WindowsTerminalP
     Exit;
 }
 
-$Architecture = (Get-WmiObject Win32_OperatingSystem).OSArchitecture;
-$IsArm = $false;
-if($Architecture.StartsWith("ARM")) {
-    $IsArm = $true;
-}
+# Powershell
 
-#################################################################
-# POWERSHELL
-#################################################################
-
-if($All.IsPresent -or $PowerShellProfile.IsPresent) {
-    if(!(Test-Path $PROFILE) -or $Force.IsPresent -or $All.IsPresent) {
+if ($All.IsPresent -or $PowerShellProfile.IsPresent) {
+    if (!(Test-Path $PROFILE) -or $Force.IsPresent) {
         # Update PowerShell profile
         Write-Host "Adding PowerShell profile...";
         $MachinePath = (Get-Item (Join-Path $PSScriptRoot "../../")).FullName
@@ -62,11 +53,9 @@ if($All.IsPresent -or $PowerShellProfile.IsPresent) {
     }
 }
 
-#################################################################
-# WINDOWS TERMINAL
-#################################################################
+# Windows Terminal
 
-if($All.IsPresent -or $WindowsTerminalProfile.IsPresent) {
+if ($All.IsPresent -or $WindowsTerminalProfile.IsPresent) {
     Assert-Administrator -FailMessage "Installing Windows Terminal profile requires administrator privilegies.";
     Assert-WindowsTerminalInstalled;
 
@@ -91,9 +80,7 @@ if($All.IsPresent -or $WindowsTerminalProfile.IsPresent) {
     [Environment]::SetEnvironmentVariable("WINDOWSTERMINAL_ICONS", "$IconsPath", "User")
 }
 
-#################################################################
-# FONTS
-#################################################################
+# Fonts
 
 if($All.IsPresent -or $Fonts.IsPresent) {
     # Install RobotoMono font
@@ -102,9 +89,8 @@ if($All.IsPresent -or $Fonts.IsPresent) {
     Install-Font -FontPath $FontPath;
 }
 
-#################################################################
-# OH-MY-POSH
-#################################################################
+
+# Oh-my-posh
 
 if($All.IsPresent -or $OhMyPosh.IsPresent) {
     $OhMyPoshPath = "$env:LOCALAPPDATA\Oh-My-Posh"
@@ -119,15 +105,12 @@ if($All.IsPresent -or $OhMyPosh.IsPresent) {
             Remove-Item $OhMyPoshExe | Out-Null
         }
 
-        if($IsArm) {
-            Invoke-Webrequest "https://github.com/JanDeDobbeleer/oh-my-posh3/releases/latest/download/posh-windows-386.exe" -OutFile $OhMyPoshExe
-        } else {
-            Invoke-Webrequest "https://github.com/JanDeDobbeleer/oh-my-posh3/releases/latest/download/posh-windows-amd64.exe" -OutFile $OhMyPoshExe
-        }
+        Invoke-Webrequest "https://github.com/JanDeDobbeleer/oh-my-posh3/releases/latest/download/posh-windows-amd64.exe" -OutFile $OhMyPoshExe
+
     } else {
         Write-Debug "Oh-My-Posh already installed"
     }
-    
+
     # Add to PATH?
     $CurrentPath = [System.Environment]::GetEnvironmentVariable("PATH", "User");
     if(!($CurrentPath -like "*$OhMyPoshPath*")) {

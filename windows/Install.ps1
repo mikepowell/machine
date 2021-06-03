@@ -9,8 +9,7 @@ Param(
 )
 
 # Nothing selected? Show help screen.
-if (!$Prereqs.IsPresent -and !$Ubuntu.IsPresent -and !$Apps.IsPresent `
-    -and !$VisualStudio.IsPresent -and !$Starship.IsPresent)
+if (!$Prereqs.IsPresent -and !$Ubuntu.IsPresent -and !$Apps.IsPresent)
 {
     Get-Help .\Install.ps1
     Exit;
@@ -24,7 +23,7 @@ Assert-Administrator -FailMessage "This script must be run as administrator.";
 
 # Install BoxStarter + Chocolatey if missing
 if (!(Assert-CommandExists -CommandName "Install-BoxstarterPackage")) {
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1')); 
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1'));
     Get-Boxstarter -Force
 }
 
